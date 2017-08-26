@@ -15,7 +15,7 @@ resource "aws_key_pair" "keypair" {
 }
 
 # User-data template
-resource "template_file" "user_data" {
+data "template_file" "user_data" {
 
     template = "${file("${path.module}/files/userdata.template")}"
 
@@ -44,10 +44,6 @@ resource "template_file" "user_data" {
 
     }
 
-    lifecycle {
-        create_before_destroy = true
-    }
-
 }
 
 # Create instance
@@ -70,7 +66,7 @@ resource "aws_instance" "rancher_server" {
 
     # User-data
     # Installs docker, starts containers and performs initial server setup
-    user_data = "${template_file.user_data.rendered}"
+    user_data = "${data.template_file.user_data.rendered}"
 
     # Instance profile - sets required permissions to access other aws resources
     iam_instance_profile = "${aws_iam_instance_profile.rancher_server_instance_profile.id}"

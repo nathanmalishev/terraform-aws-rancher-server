@@ -6,9 +6,7 @@
 resource "aws_iam_instance_profile" "rancher_server_instance_profile" {
 
     name = "${var.server_name}-instance-profile"
-    roles = [
-        "${aws_iam_role.rancher_server_role.name}"
-    ]
+    role = "${aws_iam_role.rancher_server_role.name}"
 
     lifecycle {
         create_before_destroy = true
@@ -133,10 +131,7 @@ resource "aws_iam_policy_attachment" "rancher_server_s3_policy" {
 
     name = "${var.server_name}_s3_policy"
     policy_arn = "${aws_iam_policy.s3_server_credentials.arn}"
-    roles = [
-        "${aws_iam_role.rancher_server_role.name}"
-    ]
-    
+    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
 }
 
 # SQS access
@@ -144,10 +139,7 @@ resource "aws_iam_policy_attachment" "rancher_server_sqs_policy" {
 
     name = "${var.server_name}_sqs_policy"
     policy_arn = "${aws_iam_policy.sqs_queue_access.arn}"
-    roles = [
-        "${aws_iam_role.rancher_server_role.name}"
-    ]
-    
+    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
 }
 
 # Complete autoscaling hook
@@ -155,8 +147,6 @@ resource "aws_iam_policy_attachment" "complete_autoscaling_hooks" {
 
     name = "${var.server_name}_complete_autoscaling_hooks"
     policy_arn = "${aws_iam_policy.autoscaling_complete_lifecycle_action.arn}"
-    roles = [
-        "${aws_iam_role.rancher_server_role.name}"
-    ]
+    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
     
 }
