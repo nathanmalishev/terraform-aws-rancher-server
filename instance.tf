@@ -36,10 +36,6 @@ resource "aws_instance" "rancher_server" {
     # SSH key
     key_name = "${aws_key_pair.keypair.key_name}"
 
-    # User-data
-    # Installs docker, starts containers and performs initial server setup
-    user_data = "${data.template_file.user_data.rendered}"
-
     # Instance profile - sets required permissions to access other aws resources
     iam_instance_profile = "${aws_iam_instance_profile.rancher_server_instance_profile.id}"
 
