@@ -64,57 +64,6 @@ EOF
 
 }
 
-# SQS queue create & delete messages
-# Allows the autoscaling hook app to receive and process messages
-# published to the SQS queue.
-resource "aws_iam_policy" "sqs_queue_access" {
-
-    name = "${var.server_name}-SQS-queue-access"
-    path = "/"
-    description = "Allow the lifecycle hook app to receive and process SQS queue messages."
-    policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sqs:DeleteMessage",
-        "sqs:ReceiveMessage"
-      ],
-      "Resource": [
-        "${aws_sqs_queue.autoscaling_hooks_queue.arn}"
-      ]
-    }
-  ]
-}
-EOF
-
-}
-
-# Autoscaling lifecycle complete action
-resource "aws_iam_policy" "autoscaling_complete_lifecycle_action" {
-
-    name = "${var.server_name}-Allow-autoscaling-complete-action"
-    path = "/"
-    description = "Allow the lifecycle hook app send a complete action request that releases the instance for termination."
-    policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "autoscaling:CompleteLifecycleAction"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-
-}
-
 #############################
 ## Attach policies to role ##
 #############################
@@ -127,19 +76,3 @@ resource "aws_iam_policy_attachment" "rancher_server_s3_policy" {
     roles = [ "${aws_iam_role.rancher_server_role.name}" ]
 }
 
-# SQS access
-resource "aws_iam_policy_attachment" "rancher_server_sqs_policy" {
-
-    name = "${var.server_name}_sqs_policy"
-    policy_arn = "${aws_iam_policy.sqs_queue_access.arn}"
-    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
-}
-
-# Complete autoscaling hook
-resource "aws_iam_policy_attachment" "complete_autoscaling_hooks" {
-
-    name = "${var.server_name}_complete_autoscaling_hooks"
-    policy_arn = "${aws_iam_policy.autoscaling_complete_lifecycle_action.arn}"
-    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
-    
-}
