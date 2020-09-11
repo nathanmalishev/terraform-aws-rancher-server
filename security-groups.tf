@@ -5,12 +5,12 @@ resource "aws_security_group" "rancher_server_sg" {
     description = "Rules for the Rancher server instance."
     vpc_id = "${var.vpc_id}"
 
-    tags {
+    tags = {
         Name = "${var.server_name}"
         ManagedBy = "terraform"
     }
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "http_ingress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -43,7 +43,7 @@ resource "aws_security_group_rule" "https_ingress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "http_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -75,7 +75,7 @@ resource "aws_security_group_rule" "https_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "ssh_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 

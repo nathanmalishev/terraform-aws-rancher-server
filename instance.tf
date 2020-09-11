@@ -8,7 +8,7 @@ resource "aws_key_pair" "keypair" {
     key_name   = "${var.server_name}-key"
     public_key = "${file("${var.server_key}")}"
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
@@ -19,7 +19,7 @@ data "template_file" "user_data" {
 
     template = "${file("${path.module}/files/userdata.template")}"
 
-    vars {
+    vars = {
 
         # VPC config
         vpc_region = "${var.vpc_region}"
@@ -85,12 +85,12 @@ resource "aws_instance" "rancher_server" {
         "aws_s3_bucket.server_credentials_bucket"
     ]
 
-    tags {
+    tags = {
         Name = "${var.server_name}"
         ManagedBy = "terraform"
     }
 
-    lifecycle {
+    lifecycle = {
         create_before_destroy = true
     }
 
