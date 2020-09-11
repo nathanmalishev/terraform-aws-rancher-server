@@ -38,7 +38,7 @@ up=""
 sleepTime=5
 while [[ "$up" != "200" && "$up" != "401" ]]; do
     sleep $sleepTime
-    up=$(curl -s -o /dev/null -I -w "%{http_code}" $serverUrl)
+    up=$(curl -s -o /dev/null -I -w "%{response_code}" $serverUrl)
     echo "=> Server status: $up"
     echo "=> Waiting $sleepTime seconds for rancher server.."
 done
