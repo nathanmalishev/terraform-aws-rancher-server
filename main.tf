@@ -67,26 +67,6 @@ variable "ssl_email" {
 	description = "E-Mail address to use for Lets Encrypt account."
 }
 
-# Database
-variable "database_address" {
-    description = "Database server address."
-}
-variable "database_port" {
-    description = "Database port."
-    default = "3306"
-}
-variable "database_name" {
-    description = "Database name."
-    default = "rancherserverdb"
-}
-variable "database_username" {
-    description = "Database username."
-    default = "root"
-}
-variable "database_password" {
-    description = "Database password."
-}
-
 ##################
 ## Misc outputs ##
 ##################
