@@ -48,10 +48,3 @@ variable "ssl_email" {
 	description = "E-Mail address to use for Lets Encrypt account."
 }
 
-##################
-## Misc outputs ##
-##################
-
-output "server_hostname" {
-	value = "${var.server_hostname}"
-}
