@@ -7,16 +7,9 @@ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /
 # Install jq/docker
 yum update -y
 yum install -y jq docker
+sudo usermod -aG docker ${username}
 
 # Start docker
 service docker start
 
-# Pull required images
-docker pull rancher/server:${server_version}
-
-# Run rancher server
-docker run -d --restart=always --name=rancher-server -p 8080:8080 \
-           -e VIRTUAL_HOST=${server_hostname} \
-           -e VIRTUAL_PORT=8080 \
-              rancher/server:${server_version}
 

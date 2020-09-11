@@ -33,46 +33,4 @@ EOF
 
 }
 
-#####################
-## Custom policies ##
-#####################
-
-# S3 credentials bucket access
-# Allows the server to read/write api keys to the S3 bucket.
-resource "aws_iam_policy" "s3_server_credentials" {
-
-    name = "${var.server_name}-S3-credentials-access"
-    path = "/"
-    description = "Allow the Rancher server to access the credentials file in the S3 bucket."
-    policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${aws_s3_bucket.server_credentials_bucket.id}/keys.txt"
-      ]
-    }
-  ]
-}
-EOF
-
-}
-
-#############################
-## Attach policies to role ##
-#############################
-
-# S3 bucket access
-resource "aws_iam_policy_attachment" "rancher_server_s3_policy" {
-
-    name = "${var.server_name}_s3_policy"
-    policy_arn = "${aws_iam_policy.s3_server_credentials.arn}"
-    roles = [ "${aws_iam_role.rancher_server_role.name}" ]
-}
 

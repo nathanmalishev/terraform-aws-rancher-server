@@ -21,14 +21,6 @@ data "template_file" "user_data" {
         # VPC config
         vpc_region = "${var.vpc_region}"
 
-        # Server config
-        server_version            = "${var.server_version}"
-        server_credentials_bucket = "${aws_s3_bucket.server_credentials_bucket.id}"
-        server_hostname           = "${var.server_hostname}"
-
-        # SSL certificate
-        ssl_email = "${var.ssl_email}"
-
     }
 
 }
@@ -37,7 +29,7 @@ data "template_file" "user_data" {
 resource "aws_instance" "rancher_server" {
 
     # Amazon linux
-    ami = "${lookup(var.server_ami, var.vpc_region)}"
+    ami           = data.aws_ami.ubuntu.id
 
     # Target subnet - should be public
     subnet_id = "${var.server_subnet_id}"
@@ -67,10 +59,6 @@ resource "aws_instance" "rancher_server" {
     # Misc
     instance_type = "${var.server_instance_type}"
 
-    # Ensure S3 bucket is created first
-    depends_on = [
-        "aws_s3_bucket.server_credentials_bucket"
-    ]
 
     tags = {
         Name = "${var.server_name}"
