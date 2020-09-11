@@ -1,15 +1,11 @@
-#!/bin/bash
+#!/bin/bash -x
 
-# Get nginx template file
-mkdir -p /etc/nginx-gen
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx-gen/nginx.tmpl
-
-# Install jq/docker
-yum update -y
-yum install -y jq docker
+export DEBIAN_FRONTEND=noninteractive
+curl -sL https://releases.rancher.com/install-docker/${docker_version}.sh | sh
 sudo usermod -aG docker ${username}
+sudo apt update
 
-# Start docker
-service docker start
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-
+publicIP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/public-ipv4)
+privateIP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/local-ipv4)
