@@ -15,7 +15,7 @@ resource "aws_key_pair" "keypair" {
 resource "aws_instance" "rancher_server" {
 
     user_data = templatefile(
-      join("/", [path.module, "../cloud-common/files/userdata_rancher_server.template"]),
+      join("/", [path.module, "./files/userdata.template"]),
       {
         docker_version = var.docker_version
         username       = local.node_username
