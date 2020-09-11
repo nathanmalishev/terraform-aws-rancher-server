@@ -10,9 +10,6 @@ resource "aws_security_group" "rancher_server_sg" {
         ManagedBy = "terraform"
     }
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -27,9 +24,6 @@ resource "aws_security_group_rule" "http_ingress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -43,9 +37,6 @@ resource "aws_security_group_rule" "https_ingress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -59,9 +50,6 @@ resource "aws_security_group_rule" "http_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -75,9 +63,6 @@ resource "aws_security_group_rule" "https_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -92,9 +77,6 @@ resource "aws_security_group_rule" "ssh_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -109,9 +91,6 @@ resource "aws_security_group_rule" "docker_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
-        create_before_destroy = true
-    }
 
 }
 
@@ -125,9 +104,6 @@ resource "aws_security_group_rule" "mysql_egress" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
-    lifecycle {
-        create_before_destroy = true
-    }
 
 }
 

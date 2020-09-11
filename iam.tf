@@ -8,10 +8,6 @@ resource "aws_iam_instance_profile" "rancher_server_instance_profile" {
     name = "${var.server_name}-instance-profile"
     role = "${aws_iam_role.rancher_server_role.name}"
 
-    lifecycle = {
-        create_before_destroy = true
-    }
-
 }
 
 # Rancher server role
@@ -34,9 +30,6 @@ resource "aws_iam_role" "rancher_server_role" {
 }
 EOF
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 

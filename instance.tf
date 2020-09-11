@@ -8,9 +8,6 @@ resource "aws_key_pair" "keypair" {
     key_name   = "${var.server_name}-key"
     public_key = "${file("${var.server_key}")}"
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
@@ -90,9 +87,6 @@ resource "aws_instance" "rancher_server" {
         ManagedBy = "terraform"
     }
 
-    lifecycle = {
-        create_before_destroy = true
-    }
 
 }
 
