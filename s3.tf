@@ -5,13 +5,9 @@ resource "aws_s3_bucket" "server_credentials_bucket" {
     acl = "private"
     force_destroy = true
 
-    tags {
+    tags = {
         Name = "${var.server_hostname}"
         ManagedBy = "terraform"
-    }
-
-    lifecycle {
-        create_before_destroy = true
     }
 
 }
