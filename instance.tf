@@ -11,23 +11,16 @@ resource "aws_key_pair" "keypair" {
 
 }
 
-# User-data template
-data "template_file" "user_data" {
-
-    template = "${file("${path.module}/files/userdata.template")}"
-
-    vars = {
-
-        # VPC config
-        vpc_region = "${var.vpc_region}"
-
-    }
-
-}
-
 # Create instance
 resource "aws_instance" "rancher_server" {
 
+    user_data = templatefile(
+      join("/", [path.module, "../cloud-common/files/userdata_rancher_server.template"]),
+      {
+        docker_version = var.docker_version
+        username       = local.node_username
+      }
+    )
     # Amazon linux
     ami           = data.aws_ami.ubuntu.id
 
