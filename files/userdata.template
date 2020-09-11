@@ -5,6 +5,7 @@ mkdir -p /etc/nginx-gen
 curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx-gen/nginx.tmpl
 
 # Install jq/docker
+yum update -y
 yum install -y jq docker
 
 # Start docker
@@ -12,99 +13,10 @@ service docker start
 
 # Pull required images
 docker pull rancher/server:${server_version}
-docker pull greensheep/rancher-delete-host
-docker pull nginx:1.10-alpine
-docker pull jwilder/docker-gen:0.7.3
-docker pull jrcs/letsencrypt-nginx-proxy-companion
 
 # Run rancher server
-docker run -d --restart=always --name=rancher-server --expose 8080/tcp \
-           -e CATTLE_DB_CATTLE_MYSQL_HOST=${database_address} \
-           -e CATTLE_DB_CATTLE_MYSQL_PORT=${database_port} \
-           -e CATTLE_DB_CATTLE_MYSQL_NAME=${database_name} \
-           -e CATTLE_DB_CATTLE_USERNAME=${database_username} \
-           -e CATTLE_DB_CATTLE_PASSWORD=${database_password} \
+docker run -d --restart=always --name=rancher-server -p 8080:8080 \
            -e VIRTUAL_HOST=${server_hostname} \
            -e VIRTUAL_PORT=8080 \
-           -e LETSENCRYPT_HOST=${server_hostname} \
-           -e LETSENCRYPT_EMAIL=${ssl_email} \
               rancher/server:${server_version}
 
-# Wait for rancher server to start
-serverIp=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' rancher-server)
-serverUrl="http://$serverIp:8080/v1"
-echo "=> Rancher server URL: $serverUrl"
-up=""
-sleepTime=5
-while [[ "$up" != "200" && "$up" != "401" ]]; do
-    sleep $sleepTime
-    up=$(curl -s -o /dev/null -I -w "%%{response_code}" $serverUrl)
-    echo "=> Server status: $up"
-    echo "=> Waiting $sleepTime seconds for rancher server.."
-done
-
-# Check if we can access the server.
-# If the server is brand new, the API will be unprotected. If the API
-# is protected, we know these commands should have already been run.
-if [ "$up" == "200" ]; then
-
-    # Server unprotected, requires setup.
-    # Create some access keys
-    response=$(curl -s -X POST \
-         -H 'Accept: application/json' \
-         -H 'Content-Type: application/json' \
-         -d '{"description":"Server bootstrap access key. DO NOT DELETE!", "name":"bootstrap-access"}' \
-         $serverUrl/apikeys)
-
-    # Get the credentials
-    credentials="$(echo $response | jq -r '.publicValue'):$(echo $response | jq -r '.secretValue')"
-
-    # Write the keys a file then move to S3
-    touch /tmp/KEYS
-    echo "$credentials" > /tmp/KEYS
-    aws --region ${vpc_region} s3 cp /tmp/KEYS s3://${server_credentials_bucket}/keys.txt
-    rm /tmp/KEYS
-
-else
-
-    # Server protected, no setup needed.
-    # Load keys from S3
-    credentials=$(aws --region ${vpc_region} s3 cp s3://${server_credentials_bucket}/keys.txt -)
-
-fi
-
-# Split credentials
-credentialsArr=($${credentials//:/ })
-
-# Run autoscaling lifecycle events handler
-docker run -d --restart=always --name=asglifecycle \
-           -e RANCHER_SERVER_ACCESS_KEY=$${credentialsArr[0]} \
-           -e RANCHER_SERVER_SECRET_KEY=$${credentialsArr[1]} \
-           -e SQS_URL=${sqs_url} \
-           --link rancher-server:rancher-server \
-           greensheep/rancher-delete-host
-
-# Start Nginx
-docker run -d --restart=always --name=nginx \
-           -p 80:80 -p 443:443 \
-           -v /etc/nginx/conf.d  \
-           -v /etc/nginx/vhost.d \
-           -v /usr/share/nginx/html \
-           -v /etc/ssl/certs:/etc/nginx/certs:ro \
-              nginx:1.10-alpine
-
-# Start docker-gen
-docker run -d --restart=always --name=nginx-gen \
-           --volumes-from nginx \
-           -v /etc/nginx-gen/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
-           -v /var/run/docker.sock:/tmp/docker.sock:ro \
-              jwilder/docker-gen:0.7.3 \
-              -notify-sighup nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
-
-# Start lets encrypt
-docker run -d --restart=always --name=nginx-letsencrypt \
-           -e "NGINX_DOCKER_GEN_CONTAINER=nginx-gen" \
-           --volumes-from nginx \
-           -v /etc/ssl/certs:/etc/nginx/certs:rw \
-           -v /var/run/docker.sock:/var/run/docker.sock:ro \
-              jrcs/letsencrypt-nginx-proxy-companion

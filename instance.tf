@@ -29,16 +29,6 @@ data "template_file" "user_data" {
         # SSL certificate
         ssl_email = "${var.ssl_email}"
 
-        # SQS url
-        sqs_url = "${aws_sqs_queue.autoscaling_hooks_queue.id}"
-
-        # Database
-        database_address  = "${var.database_address}"
-        database_port     = "${var.database_port}"
-        database_name     = "${var.database_name}"
-        database_username = "${var.database_username}"
-        database_password = "${var.database_password}"
-
     }
 
 }
