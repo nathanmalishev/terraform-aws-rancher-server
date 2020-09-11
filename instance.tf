@@ -87,3 +87,6 @@ output "server_public_ip" {
 output "server_keyname" {
     value = "${aws_key_pair.keypair.key_name}"
 }
+output "server_id" {
+    value = "${aws_instance.rancher_server.id}"
+}
