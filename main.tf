@@ -2,6 +2,16 @@
 ## Variables ##
 ###############
 
+variable "docker_version" {
+  type        = string
+  description = "Docker version to install on nodes"
+  default     = "19.03"
+}
+
+locals {
+  node_username = "ubuntu"
+}
+
 # Target VPC config
 variable "vpc_id" {
     description = "ID of target VPC."
